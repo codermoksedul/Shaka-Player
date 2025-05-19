@@ -2,14 +2,19 @@
 import React from "react";
 import { FaAngleLeft } from "react-icons/fa6";
 
+interface QualityOption {
+  label: string;
+  value: string;
+}
+
 interface PlayerSettingsProps {
   settingsStep: "main" | "speed" | "quality";
   playbackRate: number;
-  availableQualities: number[];
-  currentQuality: number;
+  availableQualities: QualityOption[];
+  currentQuality: string;
   setSettingsStep: (step: "main" | "speed" | "quality") => void;
   handlePlaybackRate: (rate: number) => void;
-  handleQualityChange: (quality: number) => void;
+  handleQualityChange: (quality: string) => void;
   handleSettings: () => void;
 }
 
@@ -78,20 +83,21 @@ const PlayerSettings: React.FC<PlayerSettingsProps> = ({
           >
             <FaAngleLeft /> Quality
           </button>
-          {/* Available quality options */}
           {availableQualities.map((q) => (
             <button
-              key={q}
+              key={q.value}
               onClick={() => {
-                handleQualityChange(q);
+                handleQualityChange(q.value);
                 handleSettings();
                 setSettingsStep("main");
               }}
               className={`block w-full text-left px-2 py-1 hover:bg-themePrimaryColor hover:text-white transition-all duration-300 rounded ${
-                currentQuality === q ? "bg-themePrimaryColor text-white" : ""
+                currentQuality === q.value
+                  ? "bg-themePrimaryColor text-white"
+                  : ""
               }`}
             >
-              {q}p
+              {q.label}
             </button>
           ))}
         </>

@@ -11,7 +11,6 @@ interface VolumeSliderProps {
 }
 
 const VolumeSlider = ({ volume, isMuted, onChange }: VolumeSliderProps) => {
-  // Initialize volume from localStorage on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
