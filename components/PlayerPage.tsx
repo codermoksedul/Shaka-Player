@@ -6,29 +6,29 @@ export default function PlayerPage() {
   const streamId = "a707baca-2b5b-4860-b6f2-3bb9ae2742c9";
   const [networkSpeed, setNetworkSpeed] = useState<string | null>(null);
 
+  // These track video state info
+  const [playerCurrentTime, setPlayerCurrentTime] = useState(0);
+  const [totalDuration, setTotalDuration] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(true);
+  const [isBuffering, setIsBuffering] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
+
   useEffect(() => {
     const connection = (navigator as any).connection;
-
     if (!connection) {
       setNetworkSpeed(null);
       return;
     }
-
-    // Initial speed set
     if (connection.downlink) {
       setNetworkSpeed(`${connection.downlink} Mbps`);
     }
-
-    // Event handler for connection changes
     const updateSpeed = () => {
       setNetworkSpeed(
         connection.downlink ? `${connection.downlink} Mbps` : null
       );
     };
-
     connection.addEventListener("change", updateSpeed);
-
-    // Cleanup on unmount
     return () => {
       connection.removeEventListener("change", updateSpeed);
     };
@@ -36,13 +36,27 @@ export default function PlayerPage() {
 
   return (
     <div>
-      <div className="fixed top-2 right-2 bg-black/70 text-white text-sm px-3 py-1 rounded z-50">
-        {networkSpeed ? `Speed: ${networkSpeed}` : "Measuring..."}
-      </div>
       <VideoPlayer
         connectionSpeed={networkSpeed}
         url={`${process.env.NEXT_PUBLIC_STREAMING_URI}/${streamId}/playback.m3u8`}
+        onStatusUpdate={(status) => {
+          setPlayerCurrentTime(status.currentTime);
+          setTotalDuration(status.duration);
+          setIsPlaying(status.isPlaying);
+          setIsPaused(status.isPaused);
+          setIsBuffering(status.isBuffering);
+          setIsFinished(status.isFinished);
+        }}
+        isWatermarkEnabled={false}
       />
+      <div>
+        playerCurrentTime: {playerCurrentTime.toFixed(2)} <br />
+        totalDuration: {totalDuration.toFixed(2)} <br />
+        isPlaying: {isPlaying ? "Yes" : "No"} <br />
+        isPaused: {isPaused ? "Yes" : "No"} <br />
+        isBuffering: {isBuffering ? "Yes" : "No"} <br />
+        isFinished: {isFinished ? "Yes" : "No"} <br />
+      </div>
     </div>
   );
 }

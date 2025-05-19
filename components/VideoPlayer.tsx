@@ -1,18 +1,35 @@
 "use client";
 
-import type { Level } from "hls.js"; // Import Level type separately
-import Hls from "hls.js"; // Import Hls as the class (value)
+import type { Level } from "hls.js";
+import Hls from "hls.js";
 import React, { useEffect, useRef, useState } from "react";
 
 import Controller from "./Controller";
+import DeveloperProtect from "./DeveloperProtect";
+import DynamicWaterMark from "./DynamicWaterMark";
 import KeyboardControl from "./KeyboardControl";
 
 interface VideoPlayerProps {
   url: string;
   connectionSpeed?: string | null;
+  onStatusUpdate?: (status: {
+    currentTime: number;
+    duration: number;
+    isPlaying: boolean;
+    isPaused: boolean;
+    isBuffering: boolean;
+    isFinished: boolean;
+  }) => void;
+  isWatermarkEnabled?: boolean;
+  isProtectionEnabled?: boolean;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({
+  url,
+  onStatusUpdate,
+  isProtectionEnabled = true,
+  isWatermarkEnabled,
+}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<Hls | null>(null);
@@ -29,8 +46,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
   const [settingsStep, setSettingsStep] = useState<
     "main" | "speed" | "quality"
   >("main");
-  const [availableLevels, setAvailableLevels] = useState<Level[]>([]); // Use imported Level type here
+  const [availableLevels, setAvailableLevels] = useState<Level[]>([]);
   const [currentLevel, setCurrentLevel] = useState<number>(-1);
+
+  // Notify parent about status changes
+  useEffect(() => {
+    if (!onStatusUpdate) return;
+
+    const isPaused = !isPlaying && currentTime > 0 && currentTime < duration;
+    const isFinished = duration > 0 && currentTime >= duration;
+    const isBuffering = isLoading;
+
+    onStatusUpdate({
+      currentTime,
+      duration,
+      isPlaying,
+      isPaused,
+      isBuffering,
+      isFinished,
+    });
+  }, [currentTime, duration, isPlaying, isLoading, onStatusUpdate]);
 
   const handleSettings = () => {
     setShowSettings((prev) => !prev);
@@ -54,7 +89,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         setAvailableLevels(hls.levels);
-        setCurrentLevel(-1); // auto
+        setCurrentLevel(-1);
       });
 
       hls.on(Hls.Events.LEVEL_SWITCHED, (_: any, data: any) => {
@@ -225,12 +260,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
         muted={isMuted}
       />
 
-      <div className="absolute top-2 left-3 z-30 text-xs md:text-sm px-2 py-1 rounded bg-white/20 text-white backdrop-blur-sm">
-        © codermoksedul
-      </div>
+      {/* watermark */}
+      {isWatermarkEnabled && <DynamicWaterMark />}
+      {/* protection */}
+      {isProtectionEnabled && <DeveloperProtect />}
 
+      {/* controls */}
       <KeyboardControl togglePlay={togglePlay} handleSeekBy={handleSeekBy} />
-
       <Controller
         isPlaying={isPlaying}
         isMuted={isMuted}
