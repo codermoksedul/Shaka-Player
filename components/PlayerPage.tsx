@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import VideoPlayer from "./VideoPlayer";
 
 export default function PlayerPage() {
-  const streamId = "a707baca-2b5b-4860-b6f2-3bb9ae2742c9";
+  const streamId = "ebc0f24d-67df-477a-9ef0-094a1f7d07c9";
   const [networkSpeed, setNetworkSpeed] = useState<string | null>(null);
 
   // These track video state info
@@ -47,7 +47,7 @@ export default function PlayerPage() {
           setIsBuffering(status.isBuffering);
           setIsFinished(status.isFinished);
         }}
-        isWatermarkEnabled={false}
+        isWatermarkEnabled={true}
       />
       <div>
         playerCurrentTime: {playerCurrentTime.toFixed(2)} <br />

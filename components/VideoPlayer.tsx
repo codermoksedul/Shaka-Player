@@ -3,11 +3,10 @@
 import type { Level } from "hls.js";
 import Hls from "hls.js";
 import React, { useEffect, useRef, useState } from "react";
-
-import Controller from "./Controller";
 import DeveloperProtect from "./DeveloperProtect";
 import DynamicWaterMark from "./DynamicWaterMark";
-import KeyboardControl from "./KeyboardControl";
+import Controller from "./controls/Controller";
+import KeyboardControl from "./controls/KeyboardControl";
 
 interface VideoPlayerProps {
   url: string;
