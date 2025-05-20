@@ -20,7 +20,7 @@ export default function VolumeControl({
       <button className="vdoCtrlBtn" onClick={toggleMute}>
         {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
       </button>
-      <div className="w-24">
+      <div className="w-20 lg:w-24">
         <VolumeSlider
           volume={volume}
           isMuted={isMuted}

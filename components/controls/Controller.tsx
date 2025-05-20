@@ -104,7 +104,7 @@ const Controller: React.FC<ControllerProps> = ({
 
       {isLoading && (
         <div className="absolute inset-0 flex justify-center items-center bg-black/40 bg-opacity-50">
-          <div className="animate-spin rounded-full w-[50px] h-[50px]">
+          <div className="animate-spin rounded-full w-[30px] h-[30px] lg:w-[50px] lg:h-[50px]">
             <svg
               className="w-full h-full text-themePrimaryColor animate-spin"
               xmlns="http://www.w3.org/2000/svg"
@@ -133,7 +133,7 @@ const Controller: React.FC<ControllerProps> = ({
         }`}
       >
         <button
-          className="bg-themePrimaryColor pointer-events-auto text-white text-2xl p-4 rounded-full"
+          className="bg-themePrimaryColor pointer-events-auto text-white lg:text-2xl text-xl p-2 lg:p-4 rounded-full"
           onClick={togglePlay}
         >
           {currentTime !== duration ? (
@@ -149,7 +149,7 @@ const Controller: React.FC<ControllerProps> = ({
       </div>
 
       <div
-        className={`absolute z-20 bottom-0 transition-all duration-500 left-0 right-0 bg-gradient-to-b from-transparent from-20% to-black text-white p-2 flex flex-col gap-0 ${
+        className={`absolute z-20 bottom-0 transition-all duration-500 left-0 right-0 bg-gradient-to-b from-transparent from-20% to-black text-white px-2 py-0 lg:p-2 flex flex-col gap-0 ${
           showControls
             ? "opacity-100 bottom-0"
             : "opacity-0 !-bottom-12 pointer-events-none"
@@ -175,11 +175,11 @@ const Controller: React.FC<ControllerProps> = ({
             className="cursor-pointer "
           />
         </div>
-        <div className="flex justify-between gap-4 items-center text-sm">
-          <div className="flex flex-row justify-start items-center gap-4">
+        <div className="flex justify-between gap-2 lg:gap-4 items-center text-sm">
+          <div className="flex flex-row justify-start items-center gap-1 lg:gap-4">
             <div className="flex flex-row gap-0 items-center">
               <button
-                className={`text-white pointer-events-auto flex flex-row justify-center items-center opacity-80 hover:opacity-100 transition-all duration-300 gap-0 text-sm p-2 ${
+                className={`text-white pointer-events-auto flex flex-row justify-center items-center opacity-80 hover:opacity-100 transition-all duration-300 gap-0 text-sm p-1 lg:p-2 ${
                   currentTime < 10 ? "!opacity-50 pointer-events-none" : ""
                 }`}
                 onClick={handlePrev}
@@ -198,7 +198,7 @@ const Controller: React.FC<ControllerProps> = ({
                 )}
               </button>
               <button
-                className={`text-white flex flex-row pointer-events-auto justify-center items-center opacity-80 hover:opacity-100 transition-all duration-300 gap-0 text-sm p-2 ${
+                className={`text-white flex flex-row pointer-events-auto justify-center items-center opacity-80 hover:opacity-100 transition-all duration-300 gap-0 text-sm p-1 lg:p-2 ${
                   currentTime > duration - 10
                     ? "!opacity-50 pointer-events-none"
                     : ""
@@ -209,8 +209,13 @@ const Controller: React.FC<ControllerProps> = ({
               </button>
             </div>
 
-            <div className="text-nowrap">
-              {formatTime(currentTime)} / {formatTime(duration)}
+            <div className="text-nowrap text-[12px]">
+              <span className="hidden lg:flex">
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </span>
+              <span className="lg:hidden">
+                {"-" + formatTime(duration - currentTime)}
+              </span>
             </div>
 
             <VolumeControl
@@ -221,7 +226,7 @@ const Controller: React.FC<ControllerProps> = ({
             />
           </div>
 
-          <div className="flex flex-row gap-1 items-center">
+          <div className="flex flex-row gap-0 lg:gap-1 items-center">
             <SettingsControl
               showSettings={showSettings}
               settingsStep={settingsStep}

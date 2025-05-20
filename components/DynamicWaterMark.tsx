@@ -47,7 +47,7 @@ const DynamicWaterMark: React.FC = () => {
   return (
     <>
       <div
-        className="absolute z-50 text-sm text-red-500 font-semibold pointer-events-none select-none transition-all duration-700 ease-in-out"
+        className="absolute z-50 text-[10px] md:text-sm lg:bg-black/20 rounded-md  p-1 lg:p-2 text-red-500 font-semibold pointer-events-none select-none transition-all duration-700 ease-in-out"
         style={{
           top: position.top,
           left: position.left,

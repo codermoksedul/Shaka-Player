@@ -3,10 +3,9 @@
 import type { Level } from "hls.js";
 import Hls from "hls.js";
 import React, { useEffect, useRef, useState } from "react";
-import DeveloperProtect from "./DeveloperProtect";
-import DynamicWaterMark from "./DynamicWaterMark";
 import Controller from "./controls/Controller";
 import KeyboardControl from "./controls/KeyboardControl";
+import DynamicWaterMark from "./DynamicWaterMark";
 
 interface VideoPlayerProps {
   url: string;
@@ -21,6 +20,7 @@ interface VideoPlayerProps {
   }) => void;
   isWatermarkEnabled?: boolean;
   isProtectionEnabled?: boolean;
+  fetchPlayTime?: number; // used as initial play time
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -28,13 +28,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onStatusUpdate,
   isProtectionEnabled = true,
   isWatermarkEnabled,
+  fetchPlayTime = 0,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<Hls | null>(null);
+  const initialPlayTime = fetchPlayTime;
 
   const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(initialPlayTime);
   const [volume, setVolume] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -51,7 +53,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   // Notify parent about status changes
   useEffect(() => {
     if (!onStatusUpdate) return;
-
     const isPaused = !isPlaying && currentTime > 0 && currentTime < duration;
     const isFinished = duration > 0 && currentTime >= duration;
     const isBuffering = isLoading;
@@ -66,12 +67,28 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     });
   }, [currentTime, duration, isPlaying, isLoading, onStatusUpdate]);
 
-  const handleSettings = () => {
-    setShowSettings((prev) => !prev);
-    setSettingsStep((prev) =>
-      prev === "main" ? "speed" : prev === "speed" ? "quality" : "main"
-    );
-  };
+  // Set initial time once when metadata is loaded
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const setTimeOnce = () => {
+      if (initialPlayTime > 0 && initialPlayTime <= video.duration) {
+        video.currentTime = initialPlayTime;
+        setCurrentTime(initialPlayTime);
+      }
+    };
+
+    if (video.readyState >= 1) {
+      setTimeOnce();
+    } else {
+      video.addEventListener("loadedmetadata", setTimeOnce, { once: true });
+    }
+
+    return () => {
+      video.removeEventListener("loadedmetadata", setTimeOnce);
+    };
+  }, [initialPlayTime]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -249,7 +266,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full group aspect-video rounded-xl overflow-hidden bg-black shadow-lg"
+      className="relative w-full group aspect-video rounded-md lg:rounded-xl overflow-hidden bg-black shadow-lg"
     >
       <video
         ref={videoRef}
@@ -258,13 +275,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         autoPlay={false}
         muted={isMuted}
       />
-
-      {/* watermark */}
       {isWatermarkEnabled && <DynamicWaterMark />}
-      {/* protection */}
-      {isProtectionEnabled && <DeveloperProtect />}
-
-      {/* controls */}
+      {/* {isProtectionEnabled && <DeveloperProtect />} */}
       <KeyboardControl togglePlay={togglePlay} handleSeekBy={handleSeekBy} />
       <Controller
         isPlaying={isPlaying}
@@ -280,7 +292,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         handleVolume={handleVolume}
         handleSeek={handleSeek}
         toggleFullscreen={toggleFullscreen}
-        handleSettings={handleSettings}
+        handleSettings={() => setShowSettings((s) => !s)}
         handlePlaybackRate={handlePlaybackRate}
         handleQualityChange={handleQualityChange}
         handlePrev={handlePrev}
