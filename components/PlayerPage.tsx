@@ -2,8 +2,12 @@
 import { useEffect, useState } from "react";
 import VideoPlayer from "./VideoPlayer";
 
+const StreamURI =
+  process.env.NEXT_PUBLIC_STREAM_URI ||
+  "https://cdn.uccrangpurbranch.com/uploads/streams/hls";
+
 export default function PlayerPage() {
-  const streamId = "ebc0f24d-67df-477a-9ef0-094a1f7d07c9";
+  const streamId = "20cd7451-32e1-46ab-9e97-59d585970bf1";
   const [networkSpeed, setNetworkSpeed] = useState<string | null>(null);
 
   // These track video state info
@@ -38,7 +42,7 @@ export default function PlayerPage() {
     <div>
       <VideoPlayer
         connectionSpeed={networkSpeed}
-        url={`${process.env.NEXT_PUBLIC_STREAMING_URI}/${streamId}/playback.m3u8`}
+        url={`${StreamURI}/${streamId}/playback.m3u8`}
         onStatusUpdate={(status) => {
           setPlayerCurrentTime(status.currentTime);
           setTotalDuration(status.duration);
