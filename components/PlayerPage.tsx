@@ -7,7 +7,7 @@ const StreamURI =
   "https://cdn.uccrangpurbranch.com/uploads/streams/hls";
 
 export default function PlayerPage() {
-  const streamId = "20cd7451-32e1-46ab-9e97-59d585970bf1";
+  const streamId = "a746ab0b-8a2d-4798-932f-a87c70d4b94a";
   const [networkSpeed, setNetworkSpeed] = useState<string | null>(null);
 
   // These track video state info
